@@ -14,7 +14,41 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-# add views here 
+
+@app.route('/')
+def index():
+    response = make_response(
+        '<h1>Welcome to the pet directory!</h1>',
+        200
+    )
+    return response
+
+@app.route('/pets/<int:id>')
+def pet_by_id(id):
+    
+    pet = Pet.query.filter(Pet.id == id).first()
+
+    if pet:
+        response_body = make_response(f'<p>{pet.name} {pet.species}</p>')
+        response_status = 200
+    else:
+        response_body = make_response(f'<p>Pet {id} not found</p>', 404)
+        response_status = 404
+    response = make_response(response_body, response_status)
+    return response
+
+@app.route('/pets/<string:species>')
+def pet_by_species(species):
+    pets = Pet.query.filter_by(species=species).all()
+    if pets:
+        size = len(pets)  # all() returns a list so we can get length
+        response_body = f'<h2>There are {size} {species}s</h2>'
+        for pet in pets:
+            response_body += f'<p>{pet.name}</p>'
+        response = make_response(response_body, 200)
+    else:
+        response = make_response(f'<h2>No {species}s found</h2>', 404)
+    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
