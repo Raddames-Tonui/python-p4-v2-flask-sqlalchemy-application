@@ -26,7 +26,7 @@ def index():
 @app.route('/pets/<int:id>')
 def pet_by_id(id):
     
-    pet = Pet.query.filter(Pet.id == id).first()
+    pet = Pet.query.get(id)
 
     if pet:
         response_body = make_response(f'<p>{pet.name} {pet.species}</p>')
